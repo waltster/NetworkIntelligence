@@ -58,12 +58,14 @@ export default function decodePCAP(file){
   var infile = argv[0];
   var outfile = argv[1];
 
+  console.log(`Beginning to decode file ${infile} -> ${outfile}`);
   var pcapData = await decodePCAP(infile);
+
   fs.writeFile(outfile, JSON.stringify(pcapData, null, 2), function(a){
     if(a){
       console.log(`Error: ${a}`);
     }else{
-      console.log(`File ${outfile} written.`);
+      console.log(`File ${outfile} written. ${pcapData.length} packets decoded.`);
     }
   });
 })();

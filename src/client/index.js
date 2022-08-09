@@ -2,34 +2,11 @@ import Sigma from 'sigma';
 import Graph from 'graphology';
 import FA2Layout from "graphology-layout-forceatlas2/worker.js";
 import NoverlapLayout from 'graphology-layout-noverlap/worker.js';
-import fa2 from "graphology-layout-forceatlas2";
-import forceLayout from "graphology-layout-force";
-import * as EdgesDefaultProgram from 'sigma/rendering/webgl/programs/edge.js';
-import * as EdgesFastProgram from 'sigma/rendering/webgl/programs/edge.fast.js';
 import random from 'graphology-layout/random.js';
 import ForceSupervisor from 'graphology-layout-force/worker.js';
 import chroma from "chroma-js";
 import seedrandom from 'seedrandom';
 import * as DOM from './DOMHelper.js';
-
-function addRed(hex){
-    if(!hex){
-      hex = 0;
-    }
-
-    var num = parseInt(hex, 16);
-    var red = (num & 0xFF0000) >>> 16;
-    var green = (num & 0x00FF00) >>> 8;
-    var blue = (num & 0xFF);
-
-    red += 10;
-    green += 5;
-    blue += 5;
-
-    var rgb = (red << 16) + (green << 8) + blue;
-
-    return rgb.toString(16);
-}
 
 function setSearchQuery(graph, renderer, state, query, searchInput){
   state.searchQuery = query;

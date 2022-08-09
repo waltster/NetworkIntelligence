@@ -12,7 +12,7 @@ const seedInput = document.getElementById('seed');
 const topIps = document.getElementById('top_ips');
 const nodeInfo = document.getElementById('nodeinfo');
 
-export function init(graph, renderer, state, layouts, rng, setSearchQuery){
+export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode){
   heatmap_display.innerHTML = 'Few ';
   for(const color of heatmap){
       heatmap_display.innerHTML += `<svg width="15" height="15"><rect width="20" height="20" style="fill:${color};" /></svg>`;
@@ -77,6 +77,9 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery){
       if(nodeInfo.style.display != 'none'){
         nodeInfo.style.display = 'none';
       }
+
+      state.nodeClicked = false;
+      setHoveredNode(state, graph, renderer, undefined);
   });
 
   document.addEventListener('mousedown', function(event) {

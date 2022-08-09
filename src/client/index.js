@@ -64,6 +64,11 @@ function setSearchQuery(graph, renderer, state, query, searchInput){
 }
 
 function setHoveredNode(state, graph, renderer, node){
+    if(state.nodeClicked){
+        renderer.refresh();
+        return;
+    }
+
     if(node){
         state.hoveredNode = node;
         state.hoveredNeighbors = new Set(graph.neighbors(node));
@@ -123,7 +128,7 @@ function sort(arr){
 
     state.currentLayout = layouts['seededrandom'];
 
-    DOM.init(graph, renderer, state, layouts, rng, setSearchQuery);
+    DOM.init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode);
 
     for(var i = 0; i < pcap_data.length; i++){
         var entry = pcap_data[i];
@@ -179,6 +184,12 @@ function sort(arr){
 
     renderer.on('leaveNode', function(node){
         setHoveredNode(state, graph, renderer, undefined);
+    });
+
+    renderer.on('clickNode', function(e){
+        state.nodeClicked = false;
+        setHoveredNode(state, graph, renderer, e.node);
+        state.nodeClicked = true;
     });
 
     renderer.setSetting('nodeReducer', function(node, data){

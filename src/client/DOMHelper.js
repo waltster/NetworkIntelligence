@@ -19,8 +19,9 @@ const layoutSelectionDropdown = document.getElementById('layout_selection');
 const seedInput = document.getElementById('seed');
 const topIps = document.getElementById('top_ips');
 const nodeInfo = document.getElementById('nodeinfo');
+const information = document.getElementById('information');
 
-export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode){
+export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP){
   heatmap_display.innerHTML = 'Few ';
   for(const color of heatmap){
       heatmap_display.innerHTML += `<svg width="15" height="15"><rect width="20" height="20" style="fill:${color};" /></svg>`;
@@ -73,6 +74,7 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
       nodeInfo.style.display = "block";
       nodeInfo.innerHTML = `
         <h3>${e.node} Insights</h3>
+        <p>${packetsPerIP[e.node]} packets exchanged</p>
         <a target='_blank' class='no-decoration' href='https://viz.greynoise.io/ip/${e.node}'>GreyNoise Report</a>
         <br /><br />
         <a target='_blank' class='no-decoration' href='https://security.microsoft.com/ips/${e.node}'>Defender IP Page</a>
@@ -105,4 +107,6 @@ export function postInit(graph, renderer, state, sortedNodes, sortIPAddresses){
   for(var i = 0; i < 10; i++){
     top_ips.innerHTML += `<li><a target='_blank' class='no-decoration' href='https://viz.greynoise.io/ip/${sortedNodes[i]}'>${sortedNodes[i]}</a></li>`;
   }
+
+  information.innerHTML += `<p class='center'>${graph.order} nodes total</p>`;
 }

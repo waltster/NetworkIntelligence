@@ -114,6 +114,7 @@ function sort(arr){
     const scale = chroma.scale(DOM.heatmap);
     var state = {searchQuery: ""};
     var layouts = {};
+    var packetsPerIP = {};
 
     const renderer = new Sigma.Sigma(graph, container, {
       renderEdgeLabels: true,
@@ -127,10 +128,21 @@ function sort(arr){
 
     state.currentLayout = layouts['seededrandom'];
 
-    DOM.init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode);
+    DOM.init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP);
 
     for(var i = 0; i < pcap_data.length; i++){
         var entry = pcap_data[i];
+
+        if(!packetsPerIP[entry.sourceIP]){
+            packetsPerIP[entry.sourceIP] = 0;
+        }
+
+        if(!packetsPerIP[entry.destinationIP]){
+            packetsPerIP[entry.destinationIP] = 0;
+        }
+
+        packetsPerIP[entry.sourceIP] += 1;
+        packetsPerIP[entry.destinationIP] += 1;
 
         if(!graph.hasNode(entry.sourceIP)){
             graph.addNode(entry.sourceIP, {size: 20, label: entry.sourceIP});
@@ -157,15 +169,16 @@ function sort(arr){
     }
 
     var sortedNodes = {};
+    var maxPackets = Math.max.apply(null, Object.values(packetsPerIP));
+    var minPackets = Math.min.apply(null, Object.values(packetsPerIP));
+    console.log(`${minPackets} ${maxPackets}`);
 
     graph.nodes().forEach(function(node, i){
         const angle = (i * 2 * Math.PI) / graph.order;
         const degree = graph.degree(node);
-        const size = Math.min(((1 + degree) / (100)) * 50, 300);
+        const size = Math.min(Math.max(((1 + packetsPerIP[node]) / (maxPackets - minPackets)) * 100, 1), 100);
 
-        //graph.setNodeAttribute(node, "x", 100 * Math.cos(angle));
-        //graph.setNodeAttribute(node, "y", 100 * Math.sin(angle));
-        graph.setNodeAttribute(node, "color", `${scale(degree / graph.order * 40).hex()}`);
+        graph.setNodeAttribute(node, "color", `${scale(((packetsPerIP[node] - minPackets) / (maxPackets - minPackets)) * 2).hex()}`);
         graph.setNodeAttribute(node, "size", size);
         graph.setNodeAttribute(node, "x", Math.random() * 1000);
         graph.setNodeAttribute(node, "y", Math.random() * 1000);

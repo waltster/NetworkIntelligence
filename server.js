@@ -1,3 +1,11 @@
+/**
+ *
+ * Copyright 2022, University of South Carolina. All rights reserved.
+ * Released under the license found in LICENSE.md.
+ *
+ * @date 9 August 2022
+ * @author Walter Pach <walterdpach@gmail.com>
+ */
 import decodePCAP from './src/pcap_converter.js';
 import fs from 'fs';
 import {E_400, E_404, E_500} from './src/standard_response.js';

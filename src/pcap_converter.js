@@ -1,3 +1,11 @@
+/**
+ *
+ * Copyright 2022, University of South Carolina. All rights reserved.
+ * Released under the license found in LICENSE.md.
+ *
+ * @date 9 August 2022
+ * @author Walter Pach <walterdpach@gmail.com>
+ */
 import * as pcap_parser from 'pcap-parser';
 import pcap from 'pcap';
 import fs from 'fs';

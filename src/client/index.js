@@ -1,3 +1,11 @@
+/**
+ *
+ * Copyright 2022, University of South Carolina. All rights reserved.
+ * Released under the license found in LICENSE.md.
+ *
+ * @date 9 August 2022
+ * @author Walter Pach <walterdpach@gmail.com>
+ */
 import Sigma from 'sigma';
 import Graph from 'graphology';
 import FA2Layout from "graphology-layout-forceatlas2/worker.js";
@@ -7,6 +15,20 @@ import ForceSupervisor from 'graphology-layout-force/worker.js';
 import chroma from "chroma-js";
 import seedrandom from 'seedrandom';
 import * as DOM from './DOMHelper.js';
+
+function sortIPAddresses(a, b) {
+  const numA = Number(
+    a.split('.')
+      .map((num, idx) => num * Math.pow(2, (3 - idx) * 8))
+      .reduce((a, v) => ((a += v), a), 0)
+  );
+  const numB = Number(
+    b.split('.')
+      .map((num, idx) => num * Math.pow(2, (3 - idx) * 8))
+      .reduce((a, v) => ((a += v), a), 0)
+  );
+  return numA - numB;
+}
 
 function setSearchQuery(graph, renderer, state, query, searchInput){
   state.searchQuery = query;
@@ -30,7 +52,7 @@ function setSearchQuery(graph, renderer, state, query, searchInput){
       renderer.getCamera().animate(nodePosition, {duration: 500});
     }else{
       state.selectedNode = undefined;
-      state.suggestions = new Set(suggestions.map(({ id }) => id));
+      state.suggestions = new Set(suggestions.map(({ id }) => id).sort(sortIPAddresses));
     }
   }else{
     state.selectedNode = undefined;
@@ -153,7 +175,7 @@ function sort(arr){
 
     sortedNodes = sort(sortedNodes).reverse();
 
-    DOM.postInit(graph, renderer, state, sortedNodes);
+    DOM.postInit(graph, renderer, state, sortedNodes, sortIPAddresses);
 
     renderer.on('enterNode', function(node){
         setHoveredNode(state, graph, renderer, node.node);

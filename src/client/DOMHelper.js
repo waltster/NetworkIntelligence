@@ -1,3 +1,11 @@
+/**
+ *
+ * Copyright 2022, University of South Carolina. All rights reserved.
+ * Released under the license found in LICENSE.md.
+ *
+ * @date 9 August 2022
+ * @author Walter Pach <walterdpach@gmail.com>
+ */
 import seedrandom from 'seedrandom';
 import random from 'graphology-layout/random.js';
 
@@ -89,8 +97,8 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
     }, false);
 };
 
-export function postInit(graph, renderer, state, sortedNodes){
-  searchSuggestions.innerHTML = graph.nodes().map(function(node){
+export function postInit(graph, renderer, state, sortedNodes, sortIPAddresses){
+  searchSuggestions.innerHTML = graph.nodes().sort(sortIPAddresses).map(function(node){
     return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
   });
 

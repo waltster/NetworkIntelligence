@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <title>NetworkIntelligence - Walter Pach</title>
+    <style>
+      html, body{
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-family: 'Arial', sans-serif;
+      }
+
+      #container{
+        width: 90%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        float: right;
+      }
+
+      #header{
+        padding: 1em;
+        background: #f3f3f3;
+        border-bottom: 1px solid black;
+      }
+
+      #tagline, #tagline h2{
+        display: inline;
+      }
+
+      #search-bar {
+        float: right;
+        padding: 5px;
+      }
+
+      #controls {
+        padding-top: 10px;
+      }
+
+      #heatmap_display{
+        display: inline;
+        float: right;
+      }
+
+      #information {
+        left: 0;
+        background: #f3f3f3;
+        width: 12em;
+        position: absolute;
+        height: 100%;
+        z-index: 2;
+        border-right: 1px solid black;
+      }
+
+      #nodeinfo {
+        right: 0;
+        background: #f3f3f3;
+        width: 10%;
+        margin: 0;
+        position: absolute;
+        height: 100%;
+        padding-right: 0.5em;
+        padding-left: 0.5em;
+        display: none;
+        text-align: center;
+        border-left: 1px solid black;
+      }
+
+      .center{
+        text-align: center;
+      }
+
+      .no-decoration{
+        text-decoration: none;
+        color: blue;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      #attribution {
+        text-align: center;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <div>
+        <div id="tagline">
+          <h2>NetworkIntelligence - PCAP Modeller</h2>
+        </div>
+        <div id="search-bar">
+          <input type="search" id="search-input" list="suggestions" placeholder="Search an IP" />
+          <datalist id="suggestions"></datalist>
+        </div>
+      </div>
+      <div>
+        <div id="controls">
+          <select id="layout_selection">
+              <option value="seededrandom">Seeded Random</option>
+              <option value="FA2Layout">ForceAtlas2 Layout</option>
+              <option value="ForceSupervisor">Force/Spring Supervisor</option>
+              <option value="NoverlapLayout">No-Overlap Layout</option>
+          </select>
+          <input type="text" id="seed" placeholder="Seed" />
+          <button id="layout_toggle">Start Layout</button>
+          <div id="heatmap_display"></div>
+        </div>
+      </div>
+    </div>
+    <div id="information">
+      <h3 class="center">Insights</h3>
+      <h4 class="center">Top IP Addresses</h4>
+      <ol id="top_ips"></ol>
+      <div id="attribution">By <a href='https://github.com/waltster'>Walter Pach</a></div>
+    </div>
+    <div id="container"></div>
+    <div id="nodeinfo"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>

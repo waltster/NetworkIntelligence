@@ -8,6 +8,7 @@
  */
 import seedrandom from 'seedrandom';
 import random from 'graphology-layout/random.js';
+import * as REDOM from 'redom';
 
 export const heatmap = ['#BD7AF6', '#7D3CB5', '#681E7E', '#06A9FC', '#0079E7', '#0052A5', '#16DD36', '#009E47', '#00753A', '#FFF735', '#FFCB35', '#FFA135', '#FF7435', '#D82735'];
 const container = document.getElementById('container');
@@ -22,11 +23,18 @@ const nodeInfo = document.getElementById('nodeinfo');
 const information = document.getElementById('information');
 
 export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP){
-  heatmap_display.innerHTML = 'Few ';
+  REDOM.mount(heatmap_display, REDOM.text('Few '));
+
   for(const color of heatmap){
-      heatmap_display.innerHTML += `<svg width="15" height="15"><rect width="20" height="20" style="fill:${color};" /></svg>`;
+      var square = REDOM.svg('svg',
+                      REDOM.svg('rect', {width: 15, height: 15, style: `fill:${color}`}),
+                      {width: 15, height: 15}
+                   );
+
+      REDOM.mount(heatmap_display, square);
   }
-  heatmap_display.innerHTML += ' Many';
+
+  REDOM.mount(heatmap_display, REDOM.text('Many'));
 
   layoutSelectionDropdown.onchange = function(){
         if(state.currentLayout != 'seededrandom') state.currentLayout.stop();
@@ -37,7 +45,7 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
             seedInput.style.display = 'inline';
         }
 
-        layoutToggleButton.innerHTML = 'Start Layout';
+        REDOM.setChildren(layoutToggleButton, REDOM.text('Start Layout'));
         state.currentLayout = layouts[layoutSelectionDropdown.value];
   };
 
@@ -51,10 +59,10 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
 
       if(state.currentLayout.isRunning()){
         state.currentLayout.stop();
-        layoutToggleButton.innerHTML = 'Start Layout';
+        REDOM.setChildren(layoutToggleButton, REDOM.text('Start Layout'));
       }else{
         state.currentLayout.start();
-        layoutToggleButton.innerHTML = 'Stop Layout';
+        REDOM.setChildren(layoutToggleButton, REDOM.text('Stop Layout'));
       }
   };
 
@@ -70,17 +78,16 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
 
   renderer.on('doubleClickNode', function(e){
       e.preventSigmaDefault();
-      console.log(e);
       nodeInfo.style.display = "block";
-      nodeInfo.innerHTML = `
-        <h3>${e.node} Insights</h3>
-        <p>${packetsPerIP[e.node]} packets exchanged.</p>
-        <a target='_blank' class='no-decoration' href='https://viz.greynoise.io/ip/${e.node}'>GreyNoise Report</a>
-        <br /><br />
-        <a target='_blank' class='no-decoration' href='https://security.microsoft.com/ips/${e.node}'>Defender IP Page</a>
-        <br /><br />
-        <a target='_blank' class='no-decoration' href='https://www.shodan.io/host/${e.node}'>Shodan Report</a>
-      `;
+
+      REDOM.setChildren(
+        nodeInfo,
+        REDOM.el('h3', `${e.node} Insights`),
+        REDOM.el('p', `${packetsPerIP[e.node]} packets exchanged.`),
+        REDOM.el('a.no-decoration.link_padding', 'Greynoise Report', {target: '_blank', href: `https://viz.greynoise.io/ip/${e.node}`}),
+        REDOM.el('a.no-decoration.link_padding', 'Defender IP Page', {target: '_blank', href: `https://security.microsoft.com/ips/${e.node}`}),
+        REDOM.el('a.no-decoration.link_padding', 'Shodan Report', {target: '_blank', href: `https://www.shodan.io/host/${e.node}`}),
+      );
   });
 
   renderer.on('clickStage', function(){
@@ -99,14 +106,32 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
     }, false);
 };
 
+window.gotoNode = function(node){
+  const nodePosition = window.renderer.getNodeDisplayData(node);
+
+  window.renderer.getCamera().animate(nodePosition, {duration: 500});
+  window.state.selectedNode = node;
+  window.renderer.refresh();
+}
+
 export function postInit(graph, renderer, state, sortedNodes, sortIPAddresses){
   searchSuggestions.innerHTML = graph.nodes().sort(sortIPAddresses).map(function(node){
     return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
   });
 
   for(var i = 0; i < (sortedNodes.length < 10 ? sortedNodes.length : 10); i++){
-    top_ips.innerHTML += `<li><a target='_blank' class='no-decoration' href='https://viz.greynoise.io/ip/${sortedNodes[i]}'>${sortedNodes[i]}</a></li>`;
+    var link = REDOM.el('a.no-decoration', `${sortedNodes[i]}`, {id: `goto-${sortedNodes[i]}`, href: `javascript:gotoNode('${sortedNodes[i]}');`});
+
+    REDOM.mount(top_ips,
+        REDOM.el('li',
+            link, {id: `li-${sortedNodes[i]}`}
+        )
+    );
   }
 
-  information.innerHTML += `<p class='center'>${graph.order} nodes total</p>`;
+  REDOM.mount(information,
+    REDOM.el('p.center',
+      REDOM.text(`${graph.order} nodes total.`)
+    )
+  );
 }

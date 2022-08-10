@@ -16,6 +16,9 @@ import chroma from "chroma-js";
 import seedrandom from 'seedrandom';
 import * as DOM from './DOMHelper.js';
 
+window.renderer = {};
+window.state = {searchQuery: ""};
+
 function sortIPAddresses(a, b) {
   const numA = Number(
     a.split('.')
@@ -62,9 +65,9 @@ function setSearchQuery(graph, renderer, state, query, searchInput){
   renderer.refresh();
 }
 
-function setHoveredNode(state, graph, renderer, node){
+window.setHoveredNode = function(state, graph, renderer, node){
     if(state.nodeClicked){
-        renderer.refresh();
+      renderer.refresh();
         return;
     }
 
@@ -112,11 +115,10 @@ function sort(arr){
     const pcap_data = await fetchPCAPData();
     const graph = new Graph();
     const scale = chroma.scale(DOM.heatmap);
-    var state = {searchQuery: ""};
     var layouts = {};
     var packetsPerIP = {};
 
-    const renderer = new Sigma.Sigma(graph, container, {
+    window.renderer = new Sigma.Sigma(graph, document.getElementById('container'), {
       renderEdgeLabels: true,
       defaultEdgeType: 'edges-fast'
     });
@@ -128,7 +130,7 @@ function sort(arr){
 
     state.currentLayout = layouts['seededrandom'];
 
-    DOM.init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP);
+    DOM.init(graph, window.renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP);
 
     for(var i = 0; i < pcap_data.length; i++){
         var entry = pcap_data[i];
@@ -183,28 +185,28 @@ function sort(arr){
         graph.setNodeAttribute(node, "x", Math.random() * 1000);
         graph.setNodeAttribute(node, "y", Math.random() * 1000);
 
-        sortedNodes[node] = degree;
+        sortedNodes[node] = packetsPerIP[node];
     });
 
     sortedNodes = sort(sortedNodes).reverse();
 
-    DOM.postInit(graph, renderer, state, sortedNodes, sortIPAddresses);
+    DOM.postInit(graph, window.renderer, state, sortedNodes, sortIPAddresses);
 
-    renderer.on('enterNode', function(node){
-        setHoveredNode(state, graph, renderer, node.node);
+    window.renderer.on('enterNode', function(node){
+        setHoveredNode(state, graph, window.renderer, node.node);
     });
 
-    renderer.on('leaveNode', function(node){
-        setHoveredNode(state, graph, renderer, undefined);
+    window.renderer.on('leaveNode', function(node){
+        setHoveredNode(state, graph, window.renderer, undefined);
     });
 
-    renderer.on('clickNode', function(e){
+    window.renderer.on('clickNode', function(e){
         state.nodeClicked = false;
-        setHoveredNode(state, graph, renderer, e.node);
+        setHoveredNode(state, graph, window.renderer, e.node);
         state.nodeClicked = true;
     });
 
-    renderer.setSetting('nodeReducer', function(node, data){
+    window.renderer.setSetting('nodeReducer', function(node, data){
       var res = {...data};
 
       if(state.hoveredNeighbors && !state.hoveredNeighbors.has(node) && state.hoveredNode !== node){
@@ -220,7 +222,7 @@ function sort(arr){
       return res;
     });
 
-    renderer.setSetting('edgeReducer', function(edge, data){
+    window.renderer.setSetting('edgeReducer', function(edge, data){
       var res = {...data};
 
       if(state.hoveredNode && !graph.hasExtremity(edge, state.hoveredNode)){
@@ -234,6 +236,6 @@ function sort(arr){
       return res;
     });
 
-    renderer.refresh();
+    window.renderer.refresh();
     random.assign(graph, {rng: rng});
 })();

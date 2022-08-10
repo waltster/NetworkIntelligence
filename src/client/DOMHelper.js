@@ -74,7 +74,7 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
       nodeInfo.style.display = "block";
       nodeInfo.innerHTML = `
         <h3>${e.node} Insights</h3>
-        <p>${packetsPerIP[e.node]} packets exchanged</p>
+        <p>${packetsPerIP[e.node]} packets exchanged.</p>
         <a target='_blank' class='no-decoration' href='https://viz.greynoise.io/ip/${e.node}'>GreyNoise Report</a>
         <br /><br />
         <a target='_blank' class='no-decoration' href='https://security.microsoft.com/ips/${e.node}'>Defender IP Page</a>
@@ -104,7 +104,7 @@ export function postInit(graph, renderer, state, sortedNodes, sortIPAddresses){
     return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
   });
 
-  for(var i = 0; i < 10; i++){
+  for(var i = 0; i < (sortedNodes.length < 10 ? sortedNodes.length : 10); i++){
     top_ips.innerHTML += `<li><a target='_blank' class='no-decoration' href='https://viz.greynoise.io/ip/${sortedNodes[i]}'>${sortedNodes[i]}</a></li>`;
   }
 

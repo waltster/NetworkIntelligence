@@ -40,9 +40,9 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
         if(state.currentLayout != 'seededrandom') state.currentLayout.stop();
 
         if(layoutSelectionDropdown.value != 'seededrandom'){
-            seedInput.style.display = 'none';
+            seedInput.disabled = 'true';
         }else{
-            seedInput.style.display = 'inline';
+            seedInput.disabled = undefined;
         }
 
         REDOM.setChildren(layoutToggleButton, REDOM.text('Start Layout'));
@@ -78,7 +78,11 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
 
   renderer.on('doubleClickNode', function(e){
       e.preventSigmaDefault();
-      nodeInfo.style.display = "block";
+      nodeInfo.style.display = 'block';
+      window.setTimeout(function(){
+        nodeInfo.style.opacity = 1;
+        nodeInfo.style.transform = 'scale(1)';
+      },0);
 
       REDOM.setChildren(
         nodeInfo,
@@ -92,7 +96,11 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
 
   renderer.on('clickStage', function(){
       if(nodeInfo.style.display != 'none'){
-        nodeInfo.style.display = 'none';
+          nodeInfo.style.opacity = 0;
+          nodeInfo.style.transform = 'scale(0)';
+          window.setTimeout(function(){
+              nodeInfo.style.display = 'none';
+          },700);
       }
 
       state.nodeClicked = false;

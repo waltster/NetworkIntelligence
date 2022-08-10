@@ -120,7 +120,8 @@ function sort(arr){
 
     window.renderer = new Sigma.Sigma(graph, document.getElementById('container'), {
       renderEdgeLabels: true,
-      defaultEdgeType: 'edges-fast'
+      defaultEdgeType: 'edges-fast',
+      allowInvalidContainer: true
     });
 
     layouts['seededrandom'] = 'seededrandom';

@@ -26,6 +26,10 @@ app.get('/app.js', function(req, res){
     res.sendFile(__dirname + '/dist/app.js');
 });
 
+app.get('/app.css', function(req, res){
+    res.sendFile(__dirname + '/dist/app.css');
+});
+
 app.get('/pcap', async function(req, res){
 /*    try{
         var pcap_array = await decodePCAP(DEFAULT_PCAP_FILE);

@@ -6,7 +6,7 @@
  * @date 9 August 2022
  * @author Walter Pach <walterdpach@gmail.com>
  */
-import * as pcap_parser from 'pcap-parser';
+//import * as pcap_parser from 'pcap-parser';
 import pcap from 'pcap';
 import fs from 'fs';
 

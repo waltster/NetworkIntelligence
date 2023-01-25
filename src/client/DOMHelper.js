@@ -21,8 +21,9 @@ const seedInput = document.getElementById('seed');
 const topIps = document.getElementById('top_ips');
 const nodeInfo = document.getElementById('nodeinfo');
 const information = document.getElementById('information');
+const updateButton = document.getElementById('update_button');
 
-export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP){
+export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP, updateFunc){
   REDOM.mount(heatmap_display, REDOM.text('Few '));
 
   for(const color of heatmap){
@@ -67,6 +68,7 @@ export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHo
   };
 
   layoutToggleButton.addEventListener('click', toggleFA2Layout);
+  updateButton.addEventListener('click', async function(){await updateFunc(graph);});
 
   searchInput.addEventListener('input', function(){
     setSearchQuery(graph, renderer, state, searchInput.value || "", searchInput);
@@ -123,6 +125,12 @@ window.gotoNode = function(node){
 }
 
 export function postInit(graph, renderer, state, sortedNodes, sortIPAddresses){
+  try {
+    top_ips.replaceChildren();
+    searchSuggestions.innerHTML = "";
+    REDOM.unmount(information, document.getElementById('nodes-total-text'));
+  } catch(e) {}
+
   searchSuggestions.innerHTML = graph.nodes().sort(sortIPAddresses).map(function(node){
     return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
   });
@@ -139,7 +147,8 @@ export function postInit(graph, renderer, state, sortedNodes, sortIPAddresses){
 
   REDOM.mount(information,
     REDOM.el('p.center',
-      REDOM.text(`${graph.order} nodes total.`)
+      REDOM.text(`${graph.order} nodes total.`), 
+      {id: 'nodes-total-text'}
     )
   );
 }

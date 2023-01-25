@@ -2,9 +2,12 @@
 
 ## Install
 1. Install dependencies:
+* `build-essential` (or `gcc/g++`)
+* `libpcap-dev` (`libpcap` on macOS)
+* `make`
+* `NodeJS`
+
 ```sh
-$ sudo apt install libpcap-dev # Linux
-$ brew install libpcap-dev     # macOS
 $ npm install
 ```
 

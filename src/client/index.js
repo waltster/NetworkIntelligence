@@ -110,7 +110,75 @@ function sort(arr){
     return sortedKeys;
 }
 
-(async function(){
+async function rehydrate(graph){
+    const pcap_data = await fetchPCAPData();
+    const scale = chroma.scale(DOM.heatmap);
+    var packetsPerIP = {};
+    
+    graph.clear(); 
+    for(var i = 0; i < pcap_data.length; i++){
+        var entry = pcap_data[i];
+
+        if(!packetsPerIP[entry.sourceIP]){
+            packetsPerIP[entry.sourceIP] = 0;
+        }
+
+        if(!packetsPerIP[entry.destinationIP]){
+            packetsPerIP[entry.destinationIP] = 0;
+        }
+
+        packetsPerIP[entry.sourceIP] += 1;
+        packetsPerIP[entry.destinationIP] += 1;
+
+        if(!graph.hasNode(entry.sourceIP)){
+            graph.addNode(entry.sourceIP, {size: 20, label: entry.sourceIP});
+        }
+
+        if(!graph.hasNode(entry.destinationIP)){
+            graph.addNode(entry.destinationIP, {size: 20, label: entry.destinationIP});
+        }
+
+        if(!graph.hasEdge(entry.sourceIP, entry.destinationIP)){
+            graph.addEdge(entry.sourceIP, entry.destinationIP, {type: 'line', size: 1, weight: 1});
+        }else{
+            var count = 0;
+
+            graph.updateEdge(entry.sourceIP, entry.destinationIP, function(attributes){
+              count = attributes.weight + 1;
+
+              return {
+                ...attributes,
+                size: Math.min((attributes.size || 0) + 0.25, 5)
+              };
+            });
+        }
+    }
+
+    var sortedNodes = {};
+    var maxPackets = Math.max.apply(null, Object.values(packetsPerIP));
+    var minPackets = Math.min.apply(null, Object.values(packetsPerIP));
+    console.log(`${minPackets} ${maxPackets}`);
+
+    graph.nodes().forEach(function(node, i){
+        const angle = (i * 2 * Math.PI) / graph.order;
+        const degree = graph.degree(node);
+        const size = Math.min(Math.max(((1 + packetsPerIP[node]) / (maxPackets - minPackets)) * 100, 1), 100);
+
+        graph.setNodeAttribute(node, "color", `${scale(((packetsPerIP[node] - minPackets) / (maxPackets - minPackets)) * 2).hex()}`);
+        graph.setNodeAttribute(node, "size", size);
+        graph.setNodeAttribute(node, "x", Math.random() * 1000);
+        graph.setNodeAttribute(node, "y", Math.random() * 1000);
+
+        sortedNodes[node] = packetsPerIP[node];
+    });
+    
+    sortedNodes = sort(sortedNodes).reverse();
+
+    DOM.postInit(graph, window.renderer, state, sortedNodes, sortIPAddresses);
+    window.renderer.refresh();
+}
+
+async function update(){
     var rng = seedrandom("networkintelligence");
     const pcap_data = await fetchPCAPData();
     const graph = new Graph();
@@ -131,7 +199,7 @@ function sort(arr){
 
     state.currentLayout = layouts['seededrandom'];
 
-    DOM.init(graph, window.renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP);
+    DOM.init(graph, window.renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP, rehydrate);
 
     for(var i = 0; i < pcap_data.length; i++){
         var entry = pcap_data[i];
@@ -239,4 +307,8 @@ function sort(arr){
 
     window.renderer.refresh();
     random.assign(graph, {rng: rng});
+}
+
+(async function(){
+    await update()
 })();

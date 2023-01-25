@@ -31,19 +31,6 @@ app.get('/app.css', function(req, res){
 });
 
 app.get('/pcap', async function(req, res){
-/*    try{
-        var pcap_array = await decodePCAP(DEFAULT_PCAP_FILE);
-
-        if(!pcap_array || pcap_array.length <= 0){
-            console.error('Error: No packets found in capture decoding.');
-            return res.status(500).json(E_500);
-        }
-
-        return res.json(pcap_array);
-    }catch(e){
-        console.error(`Error in processing packet capture: ${e}`);
-        res.status(500).json(E_500);
-    }*/
     res.sendFile(__dirname + '/pcap.json');
 });
 

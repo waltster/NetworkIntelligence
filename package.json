@@ -5,9 +5,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "build": "webpack --config ./webpack.config.js && npx tailwindcss -i ./src/client/app.css -o ./dist/app.css",
+    "build": "webpack --config ./webpack.config.js",
     "js": "webpack watch --config ./webpack.config.js",
-    "css": "npx tailwindcss -i ./src/client/app.css -o ./dist/app.css --watch",
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,19 +16,16 @@
     "chroma-js": "^2.4.2",
     "express": "^4.18.1",
     "graphology": "^0.24.1",
-    "graphology-components": "^1.5.4",
     "graphology-layout": "^0.6.0",
     "graphology-layout-force": "^0.2.4",
     "graphology-layout-forceatlas2": "^0.9.2",
     "graphology-layout-noverlap": "^0.4.2",
-    "papaparse": "^5.3.2",
+    "nan": "^2.17.0",
     "pcap": "^3.1.0",
     "pcap-parser": "^0.2.1",
     "redom": "^3.29.0",
     "seedrandom": "^3.0.5",
     "sigma": "^2.3.1",
-    "tailwindscss": "^0.3.0",
-    "timers-browserify": "^2.0.12",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"
   }

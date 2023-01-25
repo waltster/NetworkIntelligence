@@ -24,131 +24,131 @@ const information = document.getElementById('information');
 const updateButton = document.getElementById('update_button');
 
 export function init(graph, renderer, state, layouts, rng, setSearchQuery, setHoveredNode, packetsPerIP, updateFunc){
-  REDOM.mount(heatmap_display, REDOM.text('Few '));
+    REDOM.mount(heatmap_display, REDOM.text('Few '));
 
-  for(const color of heatmap){
-      var square = REDOM.svg('svg',
-                      REDOM.svg('rect', {width: 15, height: 15, style: `fill:${color}`}),
-                      {width: 15, height: 15}
-                   );
+    for(const color of heatmap){
+        var square = REDOM.svg('svg',
+                        REDOM.svg('rect', {width: 15, height: 15, style: `fill:${color}`}),
+                        {width: 15, height: 15}
+        );
 
-      REDOM.mount(heatmap_display, square);
-  }
+        REDOM.mount(heatmap_display, square);
+    }
 
-  REDOM.mount(heatmap_display, REDOM.text('Many'));
+    REDOM.mount(heatmap_display, REDOM.text('Many'));
 
-  layoutSelectionDropdown.onchange = function(){
+    layoutSelectionDropdown.onchange = function(){
         if(state.currentLayout != 'seededrandom') state.currentLayout.stop();
 
         if(layoutSelectionDropdown.value != 'seededrandom'){
             seedInput.disabled = 'true';
-        }else{
+        } else{
             seedInput.disabled = undefined;
         }
 
         REDOM.setChildren(layoutToggleButton, REDOM.text('Start Layout'));
         state.currentLayout = layouts[layoutSelectionDropdown.value];
-  };
+    };
 
-  var toggleFA2Layout = function(){
-      if(state.currentLayout == 'seededrandom'){
-        var seed = seedInput.value;
-        rng = seedrandom(seed);
-        random.assign(graph, {rng: rng});
-        return;
-      }
+    var toggleFA2Layout = function(){
+        if(state.currentLayout == 'seededrandom'){
+            var seed = seedInput.value;
+            rng = seedrandom(seed);
+            random.assign(graph, {rng: rng});
+            return;
+        }
 
-      if(state.currentLayout.isRunning()){
-        state.currentLayout.stop();
-        REDOM.setChildren(layoutToggleButton, REDOM.text('Start Layout'));
-      }else{
-        state.currentLayout.start();
-        REDOM.setChildren(layoutToggleButton, REDOM.text('Stop Layout'));
-      }
-  };
+        if(state.currentLayout.isRunning()){
+            state.currentLayout.stop();
+            REDOM.setChildren(layoutToggleButton, REDOM.text('Start Layout'));
+        } else{
+            state.currentLayout.start();
+            REDOM.setChildren(layoutToggleButton, REDOM.text('Stop Layout'));
+        }
+    };
 
-  layoutToggleButton.addEventListener('click', toggleFA2Layout);
-  updateButton.addEventListener('click', async function(){await updateFunc(graph);});
+    layoutToggleButton.addEventListener('click', toggleFA2Layout);
+    updateButton.addEventListener('click', async function(){await updateFunc(graph);});
 
-  searchInput.addEventListener('input', function(){
-    setSearchQuery(graph, renderer, state, searchInput.value || "", searchInput);
-  });
+    searchInput.addEventListener('input', function(){
+        setSearchQuery(graph, renderer, state, searchInput.value || "", searchInput);
+    });
 
-  searchInput.addEventListener('blur', function(){
-    setSearchQuery(graph, renderer, state, "", searchInput);
-  });
+    searchInput.addEventListener('blur', function(){
+        setSearchQuery(graph, renderer, state, "", searchInput);
+    });
 
-  renderer.on('doubleClickNode', function(e){
-      e.preventSigmaDefault();
-      nodeInfo.style.display = 'block';
-      window.setTimeout(function(){
-        nodeInfo.style.opacity = 1;
-        nodeInfo.style.transform = 'scale(1)';
-      },0);
+    renderer.on('doubleClickNode', function(e){
+        e.preventSigmaDefault();
+        nodeInfo.style.display = 'block';
+        window.setTimeout(function(){
+            nodeInfo.style.opacity = 1;
+            nodeInfo.style.transform = 'scale(1)';
+        }, 0);
 
-      REDOM.setChildren(
-        nodeInfo,
-        REDOM.el('h3', `${e.node} Insights`),
-        REDOM.el('p', `${packetsPerIP[e.node]} packets exchanged.`),
-        REDOM.el('a.no-decoration.link_padding', 'Greynoise Report', {target: '_blank', href: `https://viz.greynoise.io/ip/${e.node}`}),
-        REDOM.el('a.no-decoration.link_padding', 'Defender IP Page', {target: '_blank', href: `https://security.microsoft.com/ips/${e.node}`}),
-        REDOM.el('a.no-decoration.link_padding', 'Shodan Report', {target: '_blank', href: `https://www.shodan.io/host/${e.node}`}),
-      );
-  });
+        REDOM.setChildren(
+            nodeInfo,
+            REDOM.el('h3', `${e.node} Insights`),
+            REDOM.el('p', `${packetsPerIP[e.node]} packets exchanged.`),
+            REDOM.el('a.no-decoration.link_padding', 'Greynoise Report', {target: '_blank', href: `https://viz.greynoise.io/ip/${e.node}`}),
+            REDOM.el('a.no-decoration.link_padding', 'Defender IP Page', {target: '_blank', href: `https://security.microsoft.com/ips/${e.node}`}),
+            REDOM.el('a.no-decoration.link_padding', 'Shodan Report', {target: '_blank', href: `https://www.shodan.io/host/${e.node}`}),
+        );
+    });
 
-  renderer.on('clickStage', function(){
-      if(nodeInfo.style.display != 'none'){
-          nodeInfo.style.opacity = 0;
-          nodeInfo.style.transform = 'scale(0)';
-          window.setTimeout(function(){
-              nodeInfo.style.display = 'none';
-          },700);
-      }
+    renderer.on('clickStage', function(){
+        if(nodeInfo.style.display != 'none'){
+            nodeInfo.style.opacity = 0;
+            nodeInfo.style.transform = 'scale(0)';
+            window.setTimeout(function(){
+                nodeInfo.style.display = 'none';
+            }, 700);
+        }
 
-      state.nodeClicked = false;
-      setHoveredNode(state, graph, renderer, undefined);
-  });
+        state.nodeClicked = false;
+        setHoveredNode(state, graph, renderer, undefined);
+    });
 
-  document.addEventListener('mousedown', function(event) {
-      if (event.detail > 1) {
-        event.preventDefault();
-      }
+    document.addEventListener('mousedown', function(event) {
+        if (event.detail > 1) {
+            event.preventDefault();
+        }
     }, false);
 };
 
 window.gotoNode = function(node){
-  const nodePosition = window.renderer.getNodeDisplayData(node);
+    const nodePosition = window.renderer.getNodeDisplayData(node);
 
-  window.renderer.getCamera().animate(nodePosition, {duration: 500});
-  window.state.selectedNode = node;
-  window.renderer.refresh();
+    window.renderer.getCamera().animate(nodePosition, {duration: 500});
+    window.state.selectedNode = node;
+    window.renderer.refresh();
 }
 
 export function postInit(graph, renderer, state, sortedNodes, sortIPAddresses){
-  try {
-    top_ips.replaceChildren();
-    searchSuggestions.innerHTML = "";
-    REDOM.unmount(information, document.getElementById('nodes-total-text'));
-  } catch(e) {}
+    try {
+        top_ips.replaceChildren();
+        searchSuggestions.innerHTML = "";
+        REDOM.unmount(information, document.getElementById('nodes-total-text'));
+    } catch(e) {}
 
-  searchSuggestions.innerHTML = graph.nodes().sort(sortIPAddresses).map(function(node){
-    return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
-  });
+    searchSuggestions.innerHTML = graph.nodes().sort(sortIPAddresses).map(function(node){
+        return `<option value="${graph.getNodeAttribute(node, "label")}"></option>`
+    });
 
-  for(var i = 0; i < (sortedNodes.length < 10 ? sortedNodes.length : 10); i++){
-    var link = REDOM.el('a.no-decoration', `${sortedNodes[i]}`, {id: `goto-${sortedNodes[i]}`, href: `javascript:gotoNode('${sortedNodes[i]}');`});
+    for(var i = 0; i < (sortedNodes.length < 10 ? sortedNodes.length : 10); i++){
+        var link = REDOM.el('a.no-decoration', `${sortedNodes[i]}`, {id: `goto-${sortedNodes[i]}`, href: `javascript:gotoNode('${sortedNodes[i]}');`});
 
-    REDOM.mount(top_ips,
-        REDOM.el('li',
-            link, {id: `li-${sortedNodes[i]}`}
+        REDOM.mount(top_ips,
+            REDOM.el('li',
+                link, {id: `li-${sortedNodes[i]}`}
+            )
+        );
+    }
+
+    REDOM.mount(information,
+        REDOM.el('p.center',
+            REDOM.text(`${graph.order} nodes total.`), 
+            {id: 'nodes-total-text'}
         )
     );
-  }
-
-  REDOM.mount(information,
-    REDOM.el('p.center',
-      REDOM.text(`${graph.order} nodes total.`), 
-      {id: 'nodes-total-text'}
-    )
-  );
 }
